@@ -61,4 +61,4 @@ function inventory:draw()
   self.downbutton:draw()
 end
 
-return inventory()
+return inventory
