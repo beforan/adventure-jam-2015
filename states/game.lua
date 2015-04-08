@@ -35,7 +35,7 @@ function stGame:init()
   self.object = Object("terrified hamster")
   
   self.player = Actor()
-  self.player.x = 500
+  self.player.x = 40
   self.player.y = 300
   
   self.inventory = require "states.game.inventory"
