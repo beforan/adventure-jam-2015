@@ -3,6 +3,7 @@ local stGame = {}
 local Theme = require "assets.theme"
 local Button = require "classes.button"
 local Object = require "classes.object"
+local Actor = require "classes.actor"
 --local UI = require "states.game.ui"
 
 function stGame:init()
@@ -33,6 +34,9 @@ function stGame:init()
   self.verb = "Default"
   self.object = Object("terrified hamster")
   
+  self.player = Actor()
+  self.player.x = 500
+  self.player.y = 300
   
   self.inventory = require "states.game.inventory"
   self.inventory.items = {
@@ -143,10 +147,12 @@ function stGame:draw()
   self:drawVerbLine()
   self:drawVerbUI()
   self.inventory:draw()
+  
+  self.player:draw()
 end
 
-function stGame:update()
-  
+function stGame:update(dt)
+  self.player:update(dt)
 end
 
 function stGame:keypressed(key)
@@ -241,6 +247,11 @@ function stGame:executeVerbLine()
       or self.defaultVerb.Room
   end
   
+  local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
+  
+  self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+  
+  --reset
   self.verb = "Default"
   self:mousemoved(love.mouse.getX(), love.mouse.getY()) --use this to reset object hover?
   return true

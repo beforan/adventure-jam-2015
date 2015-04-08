@@ -5,7 +5,7 @@ local fonts = {
     [16] = love.graphics.newFont("assets/fonts/Chivo-Regular.ttf", 16)
   },
   chivoblack = {
-    [18] = love.graphics.newFont("assets/fonts/Chivo-Black.ttf", 18),
+    [24] = love.graphics.newFont("assets/fonts/Chivo-Black.ttf", 24),
     [38] = love.graphics.newFont("assets/fonts/Chivo-Black.ttf", 38)
   }
 }
@@ -13,7 +13,7 @@ local fonts = {
 theme.fonts = {
   verbLine = fonts.chivo[16],
   verbButton = fonts.chivoblack[38],
-  actorSay = fonts.chivoblack[18]
+  actorSpeak = fonts.chivoblack[24]
 }
 
 theme.colors = {
