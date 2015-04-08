@@ -241,15 +241,26 @@ function stGame:handleObjectDefault()
 end
 
 function stGame:executeVerbLine()  
+  self.player:loseTarget()
+  
   if self.verb == "Default" then
     self.verb =
       self:getMouseZone() == self.mouseZones.Inventory and self.defaultVerb.Inventory
       or self.defaultVerb.Room
   end
   
-  local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
-  
-  self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+  --is there an object?
+  if self.object then
+    local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
+    self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+  else
+    --handle arbitrary walk to
+    if self.verb == "Walk to" then
+      self.player.target = { x = love.mouse.getX(), y = love.mouse.getY() }
+    end
+    
+    --any other verb should cancel without an object
+  end
   
   --reset
   self.verb = "Default"
