@@ -7,7 +7,19 @@ local button = Class {
     self.y = y
     self.width = w
     self.height = h
-    self.execute = action
+    
+    if action then
+      self.active = true
+    else
+      self.active = false
+    end
+    
+    self.execute = function (self)
+      if self.active then
+        if action then action() end
+      end
+    end
+    
     self.content = content
   end
 }
@@ -15,7 +27,23 @@ local button = Class {
 button.States = {
   normal = 1,
   hover = 2,
-  pressed = 3
+  pressed = 3,
+  disabled = 4
+}
+
+button.Colors = {
+  back = {
+    [button.States.normal] = Theme.colors.button.back.normal,
+    [button.States.hover] = Theme.colors.button.back.hover or Theme.colors.button.back.normal,
+    [button.States.pressed] = Theme.colors.button.back.pressed or Theme.colors.button.back.normal,
+    [button.States.disabled] = Theme.colors.button.back.disabled or Theme.colors.button.back.normal
+  },
+  text = {
+    [button.States.normal] = Theme.colors.button.text.normal,
+    [button.States.hover] = Theme.colors.button.text.hover or Theme.colors.button.text.normal,
+    [button.States.pressed] = Theme.colors.button.text.pressed or Theme.colors.button.text.normal,
+    [button.States.disabled] = Theme.colors.button.text.disabled or Theme.colors.button.text.normal
+  }
 }
 
 function button:isHover()
@@ -30,18 +58,29 @@ function button:isPressed()
   and (love.mouse.isDown("l") or love.mouse.isDown("r"))
 end
 
+function button:isActive()
+  return self.active
+end
+
 function button:getState()
-  if self:isHover() then return button.States.hover end
+  if not self:isActive() then return button.States.disabled end
   if self:isPressed() then return button.States.pressed end
+  if self:isHover() then return button.States.hover end
   return button.States.normal
 end
 
 function button:draw()
-  love.graphics.setColor(self:isHover() and Theme.colors.button.hover.back or Theme.colors.button.normal.back)
+  local colors = self.colors or button.Colors --use own override colors, or the theme
+  
+  --draw button
+  love.graphics.setColor(colors.back[self:getState()]) --set colors by state
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
   
+  
+  --draw content
+  if not self.content then return end
   if type(self.content) == "string" then
-    love.graphics.setColor(self:isHover() and Theme.colors.button.hover.text or Theme.colors.button.normal.text)
+    love.graphics.setColor(colors.text[self:getState()])
     love.graphics.setFont(Theme.fonts.verbButton)
     love.graphics.printf(
       self.content,

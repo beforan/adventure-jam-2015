@@ -18,13 +18,13 @@ theme.fonts = {
 
 theme.colors = {
   button = {
-    normal = {
-      back = { 3, 17, 31, 255 },
-      text = { 0, 119, 255, 255 }
+    back = {
+      normal = { 3, 17, 31, 255 },
+      hover = { 6, 39, 69, 255 }
     },
-    hover = {
-      back = { 6, 39, 69, 255 },
-      text = { 101, 173, 255, 255 }
+    text = {
+      normal = { 0, 119, 255, 255 },
+      hover = { 101, 173, 255, 255 }
     }
   }
   --verbLine = {}

@@ -3,6 +3,7 @@ local stGame = {}
 local Theme = require "assets.theme"
 local Button = require "classes.button"
 local Object = require "classes.object"
+--local UI = require "states.game.ui"
 
 function stGame:init()
   self.mouseZones = {
@@ -32,12 +33,42 @@ function stGame:init()
   self.verb = "Default"
   self.object = Object("terrified hamster")
   
-  self.Inventory = {
+  
+  self.inventory = require "states.game.inventory"
+  self.inventory.items = {
     Object("Hat"),
     Object("Coat"),
     Object("Chair"),
-    Object("Face")
+    Object("Face"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair"),
+    Object("Hat"),
+    Object("Coat"),
+    Object("Chair")
   }
+  self.inventory:updateButtons()
   
 end
 
@@ -111,6 +142,7 @@ function stGame:draw()
   
   self:drawVerbLine()
   self:drawVerbUI()
+  self.inventory:draw()
 end
 
 function stGame:update()
@@ -128,7 +160,15 @@ end
 
 function stGame:mousemoved(x, y)
   
+  --handle inventory hover
+  if self:getMouseZone() == self.mouseZones.Inventory then
+    return self:handleInventoryHover()
+  end
   
+  --if we haven't returned already, assuming we're hovering over nothing
+  -- this effectively handles mouseOut for us ;)
+  self.object = nil
+  return
 end
 
 function stGame:getDefaultVerb()
@@ -146,8 +186,9 @@ function stGame:mousepressed(x, y, button)
   if zone == self.mouseZones.Verbs
   then return self:handleVerbButtons() end
   
-  if zone == self.mouseZones.UpDown
-  then return end --TODO: UpDown handler later
+  if zone == self.mouseZones.UpDown then
+    self:handleUpDownButtons()
+  end
   
   if button == "r" then
     self:handleObjectDefault()
@@ -173,6 +214,17 @@ function stGame:handleVerbButtons()
   end
 end
 
+function stGame:handleInventoryHover()
+  for _, v in ipairs(self.inventory.buttons) do
+    if v:isHover() then v:execute() end    
+  end
+end
+
+function stGame:handleUpDownButtons()
+  if self.inventory.upbutton:isPressed() then self.inventory.upbutton:execute() end
+  if self.inventory.downbutton:isPressed() then self.inventory.downbutton:execute() end
+end
+
 function stGame:handleObjectDefault()
   if not self.object then return end
   if self:getMouseZone() == self.mouseZones.Inventory then
@@ -190,7 +242,7 @@ function stGame:executeVerbLine()
   end
   
   self.verb = "Default"
-  self.object = nil
+  self:mousemoved(love.mouse.getX(), love.mouse.getY()) --use this to reset object hover?
   return true
 end
 
