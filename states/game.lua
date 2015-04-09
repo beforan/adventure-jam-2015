@@ -7,6 +7,7 @@ local Actor = require "classes.actor"
 local Inventory = require "classes.inventory"
 
 local UI = require "states.game.ui"
+local Rooms = require "states.game.rooms"
 
 function stGame:init()
   UI.game = self --take ownership of the UI
@@ -24,14 +25,17 @@ function stGame:init()
   self.inventory:updateButtons()
   
   --handle room stuff sometime
+  Rooms.switch("test")
 end
 
 function stGame:update(dt)
+  UI:resetVerbLine(dt)
+  
   self.player:update(dt)
 end
 
 function stGame:draw()
-  self.drawRoom()
+  Rooms.current():draw()
   
   --the actual UI
   UI:drawVerbLine()
@@ -64,11 +68,6 @@ function stGame:mousemoved(x, y)
 end
 
 --helpers
-function stGame.drawRoom () --this will go to Room once that's a thing
-  love.graphics.setColor(180, 0, 0, 255)
-  love.graphics.rectangle("fill", 0, 0, 1280, 500)
-end
-
 function stGame:drawDebug()
   love.graphics.setColor(255, 255, 255, 255)
   love.graphics.setFont(Theme.fonts.verbLine)
@@ -86,12 +85,20 @@ function stGame:executeVerbLine()
   
   --is there an object?
   if self.object then
-    local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
-    self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+    if self.verb == "Walk to" then
+      self.player.target = { x = self.object.x, y = self.object.y }
+    else
+      local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
+      self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+    end
+    --fix the verbLine for a while
+    UI:executeVerbLine(self.object.executeTime)
   else
     --handle arbitrary walk to
     if self.verb == "Walk to" then
       self.player.target = { x = love.mouse.getX(), y = love.mouse.getY() }
+      --fix the verbLine for a while
+      UI:executeVerbLine(0.3)
     end
     
     --any other verb should cancel without an object

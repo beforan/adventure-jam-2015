@@ -2,6 +2,7 @@ local Class = require "lib.hump.class"
 local Button = require "classes.button"
 local Theme = require "assets.theme"
 local Gamestate = require "lib.hump.gamestate"
+local Rooms = require "states.game.rooms"
 
 local ui = Class {
   init = function (self)
@@ -17,6 +18,7 @@ local ui = Class {
       "Pull"
     }
     self.defaultVerb = { Room = "Walk to", Inventory = "Look at" }
+    self.verbResetTimer = 0
     
     self.game = nil --since this is a singleton specifically for one state, might as well refer to the one state :) - the state will need to set it though
     
@@ -74,13 +76,17 @@ function ui:drawVerbUI ()
 end
 
 function ui:drawVerbLine ()
-  love.graphics.setColor(255, 255, 255, 255)
+  local verbLine = self.executingVerbLine or
+    (self.game.verb == "Default" and self:getDefaultVerb() or self.game.verb)
+    .. " " ..
+    (self.game.object and self.game.object.name or "")
+  
+  
+  love.graphics.setColor(self.executingVerbLine and Theme.colors.verbLine.executing or Theme.colors.verbLine.normal)
   love.graphics.setFont(Theme.fonts.verbLine)
   
   love.graphics.printf(
-    (self.game.verb == "Default" and self:getDefaultVerb() or self.game.verb)
-    .. " " ..
-    (self.game.object and self.game.object.name or ""),
+    verbLine,
     0, 505, love.window.getWidth(), "center")
 end
 
@@ -110,14 +116,21 @@ function ui:handleMousePress(x, y, button)
 end
 
 function ui:handleMouseMove(x, y)
+  
+  local hoverHandled = false
   --handle inventory hover
   if self:getMouseZone() == self.mouseZones.Inventory then
-    return self:handleInventoryHover()
+    hoverHandled = self:handleInventoryHover()
   end
   
-  --if we haven't returned already, assuming we're hovering over nothing
-  -- this effectively handles mouseOut for us ;)
-  self.game.object = nil
+  --handle room object/actor hover
+  if self:getMouseZone() == self.mouseZones.Room then
+    hoverHandled = self:handleRoomObjectHover()
+    if self:handleActorHover() then hoverHandled = true end --actor hover overrides object hover, but doesn't cancel it!
+  end
+  
+  --handle mouseOut (i.e. hovering over nothing)
+  if not hoverHandled then self.game.object = nil end
   return
 end
 
@@ -129,8 +142,20 @@ end
 
 function ui:handleInventoryHover()
   for _, v in ipairs(self.game.inventory.buttons) do
-    if v:isHover() then v:execute() end    
+    if v:isHover() then v:execute(); return true end    
   end
+  return false
+end
+
+function ui:handleRoomObjectHover()
+  for _, v in ipairs(Rooms.current().objects) do
+    if v:isHover() then self.game.object = v; return true end    
+  end
+  return false
+end
+
+function ui:handleActorHover()
+  return false
 end
 
 function ui:handleUpDownButtons()
@@ -139,7 +164,7 @@ function ui:handleUpDownButtons()
 end
 
 function ui:handleObjectDefault()
-  if not self.object then return end
+  if not self.game.object then return end
   if self:getMouseZone() == self.mouseZones.Inventory then
     self.game.verb = "Default"
   else
@@ -165,4 +190,22 @@ function ui:getMouseZone()
   return self.mouseZones.UpDown
 end
 
+function ui:resetVerbLine(dt)
+  if not self.executingVerbLine then return end
+  if self.verbResetTimer <= 0 then
+    self.executingVerbLine = nil
+    return
+  end
+  self.verbResetTimer = self.verbResetTimer - dt
+end
+
+function ui:executeVerbLine(time)
+  self.executingVerbLine =
+    (self.game.verb == "Default" and self:getDefaultVerb() or self.game.verb)
+    .. " " ..
+    (self.game.object and self.game.object.name or "")
+  
+  self.verbResetTimer = time or 1
+end
+  
 return ui()

@@ -24,6 +24,11 @@ local inventory = Class {
   end
 }
 
+function inventory:add(obj)
+  table.insert(self.items, obj)
+  self:updateButtons()
+end
+
 function inventory:updateButtons()
   self.buttons = {}
   local origin = { x = 610, y = 520 }

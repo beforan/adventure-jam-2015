@@ -11,3 +11,15 @@ function love.load()
   Gamestate.registerEvents()
   Gamestate.switch(stGame)
 end
+
+
+--some global helpers, because actually useful
+--(could encapsulate these in a file later, i guess?
+
+--hover (bounding box mouse collision) for any object with x, y, width, height
+function isHover(obj)
+  local mouse = { x = love.mouse.getX(), y = love.mouse.getY() }
+  
+  return mouse.x >= obj.x and mouse.x < obj.x + obj.width
+    and mouse.y >= obj.y and mouse.y < obj.y + obj.height
+end

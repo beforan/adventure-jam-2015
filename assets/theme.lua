@@ -26,8 +26,11 @@ theme.colors = {
       normal = { 0, 119, 255, 255 },
       hover = { 101, 173, 255, 255 }
     }
+  },
+  verbLine = {
+    normal = { 0, 119, 255, 255 },
+    executing = { 101, 173, 255, 255 }
   }
-  --verbLine = {}
 }
 
 return theme

@@ -47,10 +47,7 @@ button.Colors = {
 }
 
 function button:isHover()
-  local mouse = { x = love.mouse.getX(), y = love.mouse.getY() }
-  
-  return mouse.x >= self.x and mouse.x < self.x + self.width
-    and mouse.y >= self.y and mouse.y < self.y + self.height
+  return isHover(self)
 end
 
 function button:isPressed()

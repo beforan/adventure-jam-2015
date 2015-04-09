@@ -34,7 +34,7 @@ end
 function actor:update(dt)
   if self.speechtimer > 0 then self.speechtimer = self.speechtimer - dt end
   
-  local speed = 20
+  local speed = 50
   
   --movement
   if self.target.x > -1 and self.target.y > -1 then
