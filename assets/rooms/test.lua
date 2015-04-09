@@ -19,6 +19,7 @@ return {
         for i, v in ipairs(Rooms.current().objects) do
           if v == self then table.remove(Rooms.current().objects, i) end
         end
+        self.pickup = self.noop
       end
     }
   }
