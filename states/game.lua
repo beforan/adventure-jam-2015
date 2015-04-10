@@ -1,6 +1,7 @@
 local stGame = {}
 
 local Theme = require "assets.theme"
+local Settings = require "settings"
 local Button = require "classes.button"
 local Object = require "classes.object"
 local Actor = require "classes.actor"
@@ -8,6 +9,7 @@ local Inventory = require "classes.inventory"
 
 local UI = require "states.game.ui"
 local Rooms = require "states.game.rooms"
+
 
 function stGame:init()
   UI.game = self --take ownership of the UI
@@ -29,7 +31,13 @@ function stGame:init()
 end
 
 function stGame:update(dt)
-  UI:resetVerbLine(dt)
+  if not self.blocking then
+    UI:resetVerbLine(dt)
+  end
+  
+  if self.executing then
+    self.executing.object[self.executing.verb](self.executing.object)
+  end
   
   self.player:update(dt)
 end
@@ -39,10 +47,12 @@ function stGame:draw()
   
   --the actual UI
   UI:drawVerbLine()
-  UI:drawVerbUI()
-  
-  --the inventory (draws itself, even though this is UI...)
-  self.inventory:draw()
+  if not self.blocking then
+    UI:drawVerbUI()
+    
+    --the inventory (draws itself, even though this is UI...)
+    self.inventory:draw()
+  end
   
   --draw the player
   self.player:draw()
@@ -53,18 +63,27 @@ end
 
 --Callbacks
 function stGame:keypressed(key)
-  --handle verb shortcuts
-  UI:handleVerbKeys(key)
+  if not self.blocking then
+    --handle verb shortcuts
+    UI:handleVerbKeys(key)
+  end
   
   --any other keys?
+  if Settings.debug then --debug keys
+    if key == 'r' then Rooms.resetRoom() end
+  end
 end
 
 function stGame:mousepressed(x, y, button)
-  UI:handleMousePress(x,y, button)
+  if not self.blocking then
+    UI:handleMousePress(x,y, button)
+  end
 end
 
 function stGame:mousemoved(x, y)
-  UI:handleMouseMove(x, y)
+  if not self.blocking then
+    UI:handleMouseMove(x, y)
+  end
 end
 
 --helpers
@@ -76,6 +95,7 @@ end
 
 function stGame:executeVerbLine()  
   self.player:loseTarget()
+  self.executing = nil
   
   if self.verb == "Default" then
     self.verb =
@@ -86,10 +106,9 @@ function stGame:executeVerbLine()
   --is there an object?
   if self.object then
     if self.verb == "Walk to" then
-      self.player.target = { x = self.object.x, y = self.object.y }
+      self.player.target = { x = self.object.useposition.x or self.object.x, y = self.object.useposition.y or self.object.y }
     else
-      local kVerb = self.verb:gsub(" ", ""):lower() --drop the space and lowercase it
-      self.object[kVerb](self.object) --execute the verb action on the object (passing itself)
+      self.executing = { verb = self.verb:gsub(" ", ""):lower(), object = self.object }
     end
     --fix the verbLine for a while
     UI:executeVerbLine(self.object.executeTime)
@@ -107,7 +126,6 @@ function stGame:executeVerbLine()
   --reset
   self.verb = "Default"
   self:mousemoved(love.mouse.getX(), love.mouse.getY()) --use this to reset object hover?
-  return true
 end
 
 return stGame

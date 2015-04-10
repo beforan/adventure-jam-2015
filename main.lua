@@ -23,3 +23,6 @@ function isHover(obj)
   return mouse.x >= obj.x and mouse.x < obj.x + obj.width
     and mouse.y >= obj.y and mouse.y < obj.y + obj.height
 end
+
+--Lua for some reason has no rounding function
+math.round = function (a) return math.floor(a+0.5) end

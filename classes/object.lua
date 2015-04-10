@@ -8,6 +8,7 @@ local object = Class {
       self.defaultVerb = "Look at"
       self.x = 0
       self.y = 0
+      self.useposition = {}
     end
     
     if type(param) == "table" then --build from an object spec table
@@ -32,7 +33,11 @@ local object = Class {
       if param.use then self.use = param.use end
       if param.pickup then self.pickup = param.pickup end
       if param.draw then self.draw = param.draw end
+      
+      self.useposition = param.useposition or {}
     end
+    
+    
   end
 }
 
@@ -42,10 +47,12 @@ end
 
 function object:noop()
   Gamestate.current().player:speak("That doesn't seem to work.")
+  Gamestate.current().executing = nil
 end
 
 function object:lookat()
   Gamestate.current().player:speak("An object.")
+  Gamestate.current().executing = nil
 end
 
 function object:give()
@@ -77,7 +84,16 @@ function object:use()
 end
 
 function object:pickup()
-  self:noop()
+  local inv = false
+  for _, v in ipairs(Gamestate.current().inventory.items) do
+    if v == self then inv = true; break end
+  end
+  if inv then
+    Gamestate.current().player:speak("I'm already carrying that.")
+    Gamestate.current().executing = nil
+  else
+    self:noop()
+  end
 end
 
 --for drawing in rooms

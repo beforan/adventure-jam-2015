@@ -38,10 +38,10 @@ function actor:update(dt)
   
   --movement
   if self.target.x > -1 and self.target.y > -1 then
-    if self.x < self.target.x then self.x = self.x + speed * dt end
-    if self.x > self.target.x then self.x = self.x - speed * dt end
-    if self.y < self.target.y then self.y = self.y + speed * dt end
-    if self.y > self.target.y then self.y = self.y - speed * dt end
+    if self.x < self.target.x then self.x = self.x + math.round(speed * dt) end
+    if self.x > self.target.x then self.x = self.x - math.round(speed * dt) end
+    if self.y < self.target.y then self.y = self.y + math.round(speed * dt) end
+    if self.y > self.target.y then self.y = self.y - math.round(speed * dt) end
   end
 end
 

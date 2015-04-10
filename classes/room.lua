@@ -25,4 +25,13 @@ function room:draw()
   end
 end
 
+function room:remove(obj)
+  for i, v in ipairs(self.objects) do
+    if v == obj then
+      table.remove(self.objects, i)
+      break
+    end
+  end
+end
+
 return room
