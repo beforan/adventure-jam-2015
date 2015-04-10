@@ -18,7 +18,7 @@ function actor:loseTarget()
 end
 
 function actor:speak(text)
-  self.speechtimer = 0.5 --min
+  self.speechtimer = 0.5 --minimum
   for char in text:gmatch(".") do
     self.speechtimer  = self.speechtimer + 0.05 --seconds per character?
   end

@@ -91,6 +91,7 @@ function stGame:drawDebug()
   love.graphics.setColor(255, 255, 255, 255)
   love.graphics.setFont(Theme.fonts.verbLine)
   love.graphics.print(love.mouse.getX() .. "," .. love.mouse.getY())
+  love.graphics.printf(Rooms.current().name, 0, 0, love.window.getWidth(), "center")
 end
 
 function stGame:executeVerbLine()  
@@ -105,11 +106,7 @@ function stGame:executeVerbLine()
   
   --is there an object?
   if self.object then
-    if self.verb == "Walk to" then
-      self.player.target = { x = self.object.useposition.x or self.object.x, y = self.object.useposition.y or self.object.y }
-    else
-      self.executing = { verb = self.verb:gsub(" ", ""):lower(), object = self.object }
-    end
+    self.executing = { verb = self.verb:gsub(" ", ""):lower(), object = self.object }
     --fix the verbLine for a while
     UI:executeVerbLine(self.object.executeTime)
   else

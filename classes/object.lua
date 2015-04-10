@@ -41,13 +41,26 @@ local object = Class {
   end
 }
 
+--helpers
 function object:isHover()
   return isHover(self)
 end
 
+function object:walkActorTo(actor)
+  actor.target = self.useposition or { x = self.x, y = self.y }
+  return actor.target.x == actor.x and actor.target.y == actor.y
+end
+
+--verbs
 function object:noop()
   Gamestate.current().player:speak("That doesn't seem to work.")
   Gamestate.current().executing = nil
+end
+
+function object:walkto()
+  if self:walkActorTo(Gamestate.current().player) then
+    Gamestate.current().executing = nil
+  end
 end
 
 function object:lookat()

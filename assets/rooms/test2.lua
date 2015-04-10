@@ -3,15 +3,16 @@ local Rooms = require "states.game.rooms"
 local Object = require "classes.object"
 
 return {
-  name = "test",
+  name = "test2",
   background = "",
   foreground = "",
   clipY = 0,
   objects = {
     {
-      name = "hat",
-      x = 500,
-      y = 150,
+      name = "dog",
+      x = 300,
+      y = 350,
+      useposition = { x = 300, y = 350 },
       noop = function (self)
         Gamestate.current().player:speak("You can't do that to a hat!")
         Gamestate.current().executing = nil
@@ -34,24 +35,6 @@ return {
           self.pickup = Object.pickup
           game.executing = nil
           self.blocking = false
-        end
-      end
-    },
-    {
-      name = "test2",
-      x = 200,
-      y = 100,
-      width = 100,
-      height = 300,
-      useposition = { x = 250, y = 400 },
-      lookat = function (self)
-        Gamestate.current().player:speak("Looks like test2 is on the other side of the doorway.")
-        Gamestate.current().executing = nil
-      end,
-      walkto = function (self)
-        if self:walkActorTo(Gamestate.current().player) then
-          Rooms.switch("test2")
-          Gamestate.current().executing = false
         end
       end
     }
