@@ -1,0 +1,1 @@
+local Class = require "lib.hump.class"

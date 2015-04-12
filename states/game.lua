@@ -20,7 +20,12 @@ function game:draw()
 end
 
 function game:mousepressed(x, y, button)
-  RT:verbWalkto({ x = x, y = y })
+  
+  if button == "l" then
+    RT:verbWalkto({ x = x, y = y })
+  else
+    self.player:say("Testing")
+  end
 end
 
 -- helpers

@@ -13,7 +13,9 @@ local rt = {}
 
 -- verbs
 function rt:verbWalkto(target)
-  if target.verbWalkto then target:verbWalkto()
+  if target.verbWalkto then
+    Gamestate.current().executing.script = coroutine.create(target.verbWalkto)
+  end
   else self:walkactor(self:player(), target) end
 end
 
