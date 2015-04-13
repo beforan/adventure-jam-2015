@@ -16,13 +16,13 @@ local actor = Class {
 function actor:update(dt)
   --anonymous scripts
   for i, v in ipairs(self.scripts) do
-    if not coroutine.resume(v, self, dt) then -- run the coroutine this frame
+    if not coroutine.resume(v, dt) then -- run the coroutine this frame
       table.remove(self.scripts, i) -- remove it if it's in a dead state
     end
   end
   --named scripts
   for k, v in pairs(self.scripts) do
-    if not coroutine.resume(v, self, dt) then -- run the coroutine this frame
+    if not coroutine.resume(v, dt) then -- run the coroutine this frame
       self.scripts[k] = nil -- remove it if it's in a dead state
     end
   end
@@ -102,7 +102,7 @@ function actor:move(dt, pos)
     if self.x > pos.x then self.x = self.x - math.round(speed * dt) end
     if self.y < pos.y then self.y = self.y + math.round(speed * dt) end
     if self.y > pos.y then self.y = self.y - math.round(speed * dt) end
-    coroutine.yield()
+    dt = coroutine.yield()
   end
 end
 

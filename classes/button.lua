@@ -1,5 +1,6 @@
 local Class = require "lib.hump.class"
 local Theme = require "assets.theme"
+local Utils = require "classes.utils"
 
 local button = Class {
   init = function (self, content, x, y, w, h, action)
@@ -46,8 +47,8 @@ button.Colors = {
   }
 }
 
-function button:isHover()
-  return isHover(self)
+function button:isHover(x, y)
+  return Utils.isHover(self, x, y)
 end
 
 function button:isPressed()

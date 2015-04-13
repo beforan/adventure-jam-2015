@@ -5,7 +5,7 @@ local items = {}
 
 local inventory = Class {
   init = function (self)
-    self.signals = Signal.new()
+    self.signals = Signals.new()
   end
 }
 
@@ -44,9 +44,15 @@ end
 
 --get a reference to an object in the inventory, by index or name
 function inventory:get(obj)
-  if type(obj) == "number" then return items[obj end
+  if type(obj) == "number" then return items[obj] end
   
   for _, v in ipairs(items) do
     if v == obj or v.name == obj then return v end
   end
 end
+
+function inventory:count() --item count; the UI uses this! not sure anything else will
+  return #items
+end
+
+return inventory

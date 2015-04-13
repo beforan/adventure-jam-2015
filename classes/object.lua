@@ -42,8 +42,8 @@ local object = Class {
 }
 
 --helpers
-function object:isHover()
-  return isHover(self)
+function object:isHover(x, y)
+  return isHover(self, x, y)
 end
 
 function object:walkActorTo(actor)
