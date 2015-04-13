@@ -1,5 +1,6 @@
 local Class = require "lib.hump.class"
 local Gamestate = require "lib.hump.gamestate"
+local Utils = require "classes.utils"
 
 local object = Class {
   init = function (self, param)
@@ -43,7 +44,7 @@ local object = Class {
 
 --helpers
 function object:isHover(x, y)
-  return isHover(self, x, y)
+  return Utils.isHover(self, x, y)
 end
 
 function object:walkActorTo(actor)

@@ -4,10 +4,13 @@ local Signals = require "lib.hump.signal"
 
 local Actor = require "classes.actor"
 local Verb = require "classes.verb"
+local Object = require "classes.object"
+
 local RT = require "states.game.runtime"
 local UI = require "states.game.ui"
+local Rooms = require "states.game.rooms"
 local Theme = require "assets.theme"
-local Object = require "classes.object"
+
 
 function game:init()
   self.verbs = {
@@ -23,10 +26,9 @@ function game:init()
   }
   self.defaultVerb = { Room = Verb("Walk to"), Inventory = self.verbs[5] }
   
-  self.current = {
-    verb = nil,
-    target = nil,
-  }
+  self.verb = nil
+  self.target = nil
+    
   --[[self.executing = {
     verb = nil,
     target = nil,
@@ -37,6 +39,9 @@ function game:init()
   
   self:switchPlayer(Actor())
   self.player:setPos({ x = 40, y = 300 })
+  
+  --handle room stuff sometime
+  Rooms.switch("test")
 end
 
 function game:enter()
@@ -46,6 +51,29 @@ end
 function game:update(dt)
   if self.player.inventory:count() == 0 then
     self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
+    self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
+    self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
+    self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
+    self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
+    self.player.inventory:add(Object("hat"))
+    self.player.inventory:add(Object("dog"))
+    self.player.inventory:add(Object("cat"))
+    self.player.inventory:add(Object("log"))
   end
   
   self.player:update(dt)
@@ -54,6 +82,8 @@ function game:update(dt)
 end
 
 function game:draw()
+  Rooms.current():draw()
+  
   self.player:draw()
   
   UI:draw()
@@ -63,16 +93,15 @@ end
 
 -- Callbacks
 function game:mousepressed(x, y, button)
-  
-  if button == "l" then
-    RT:verbWalkto({ x = x, y = y })
-  else
-    self.player:say("Testing")
-  end
+  UI:mousepressed(x, y, button)
 end
 
 function game:keypressed(key)
   UI:keypressed(key)
+end
+
+function game:mousemoved(x, y)
+  UI:mousemoved(self, x, y)
 end
 
 -- Helpers

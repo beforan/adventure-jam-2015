@@ -12,7 +12,7 @@ local hotspot = Class {
 }
 
 function hotspot:isHover(x, y)
-  Utils.isHover(self, x, y)
+  return Utils.isHover(self, x, y)
 end
 
 return hotspot

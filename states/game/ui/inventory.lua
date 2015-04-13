@@ -83,7 +83,7 @@ function ui:updateButtons()
       self.buttons[i] = Button(
         item.name,
         x, y, self.buttons.width, self.buttons.height,
-        function () Gamestate.current().current.target = item end)
+        function () Gamestate.current().target = item end)
     else
       self.buttons[i] = Button(
       nil,
@@ -123,6 +123,23 @@ end
 -- Callbacks
 function ui:inventoryChanged()
   self:updateButtons()
+end
+
+function ui:mousemoved(x, y)
+  for _, v in ipairs(self.buttons) do
+    if v:isHover() then
+      v:execute()
+      return true
+    end
+  end
+  return false
+end
+
+function ui:mousepressed(x, y, button)
+  --inventory buttons execute on hover - clicks are handled by the game itself
+  --only button presses we care about are UpDown
+  if self.buttonsUpDown.up:isPressed() then self.buttonsUpDown.up:execute() end
+  if self.buttonsUpDown.down:isPressed() then self.buttonsUpDown.down:execute() end
 end
 
 return ui()

@@ -54,7 +54,16 @@ end
 function ui:keypressed(key)
   local game = Gamestate.current()
   for _, v in ipairs(game.verbs) do
-    if v.key == key then return RT[v.id](RT) end
+    if v.key == key then
+      game.current.verb = v
+      break
+    end
+  end
+end
+
+function ui:mousepressed(x, y, button)
+  for _, v in ipairs(self.buttons) do
+    if v:isPressed() then v:execute() end    
   end
 end
 

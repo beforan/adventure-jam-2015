@@ -24,13 +24,13 @@ function ui:update(dt)
     --for now let's always do the quick timer, like previously
   end
   
-  if not game.executing then --or self.holdtimer <= 0 then -- hover / preview mode
+  --if not game.executing then --or self.holdtimer <= 0 then -- hover / preview mode
     self.hold = false
     self.text =
-      (game.current.verb and game.current.verb.name or game:getDefaultVerb().name)
+      (game.verb and game.verb.name or game:getDefaultVerb().name)
       .. " " ..
-      (game.current.target and game.current.target.name or "")
-  end
+      (game.target and game.target.name or "")
+  --end
 end
 
 function ui:draw()
