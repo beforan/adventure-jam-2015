@@ -87,6 +87,14 @@ function actor:shutUp()
 end
 
 
+-- helpers
+function actor:pickup(item)
+  self.inventory:add(item)
+end
+function actor:drop(item)
+  self.inventory:remove(item)
+end
+
 -- status
 function actor:isMoving()
   return self.scripts.move ~= nil

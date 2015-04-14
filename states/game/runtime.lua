@@ -28,15 +28,11 @@ function rt:executeVerb(exec)
     end
   end
   
-  self[exec.verb.id](self, exec)
-end
-
-function rt:verbWalkto(exec)
-  if exec.target.type then
-    exec.script = coroutine.create(exec.target.verbWalkto)
-  else
-    self:walkactor(self:player(), exec.target)
+  if exec.verb == game:getVerb("Walk to") and not exec.target.type then
+    return self:walkactor(self:player(), exec.target)
   end
+  
+  exec.script = coroutine.create(exec.target[exec.verb.id])
 end
 
 

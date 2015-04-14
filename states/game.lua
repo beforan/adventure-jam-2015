@@ -41,7 +41,7 @@ function game:enter()
 end
 
 function game:update(dt)
-  if self.player.inventory:count() == 0 then
+  --[[if self.player.inventory:count() == 0 then
     local o = Object("hat")
     o.useWith = true
     self.player.inventory:add(o)
@@ -68,7 +68,7 @@ function game:update(dt)
     self.player.inventory:add(Object("dog"))
     self.player.inventory:add(Object("cat"))
     self.player.inventory:add(Object("log"))
-  end
+  end--]]
   
   self.player:update(dt)
   
@@ -126,8 +126,8 @@ function game:execute(x, y)
     --completion conditions
     if not self.prep.target.type then -- target is a location
       self.prep.incomplete = false
-    elseif not self.prep.verb == game:getVerb("Give") then -- Give requires 2 nouns
-      if not self.prep.verb == game:getVerb("Use")
+    elseif self.prep.verb ~= game:getVerb("Give") then -- Give requires 2 nouns
+      if self.prep.verb ~= game:getVerb("Use")
         or not self.prep.target.useWith then -- Use requires 2 nouns if useWith is true
           self.prep.incomplete = false
       end
@@ -186,7 +186,7 @@ function game:drawDebug()
   love.graphics.setFont(Theme.fonts.verbline)
   love.graphics.print(love.mouse.getX() .. "," .. love.mouse.getY())
   --love.graphics.printf(Rooms.current().name, 0, 0, love.window.getWidth(), "center")
-  love.graphics.print(self.player.x .. "," .. self.player.y, 150)
+  --love.graphics.print(self.player.x .. "," .. self.player.y, 150)
 end
 
 return game

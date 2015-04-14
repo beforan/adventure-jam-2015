@@ -1,4 +1,4 @@
-local Gamestate = require "lib.hump.gamestate"
+local RT = require "states.game.runtime"
 local Rooms = require "states.game.rooms"
 local Object = require "classes.object"
 
@@ -12,29 +12,28 @@ return {
       name = "hat",
       x = 500,
       y = 150,
-      noop = function (self)
-        Gamestate.current().player:speak("You can't do that to a hat!")
-        Gamestate.current().executing = nil
+      verbBad = function (self)
+        RT:player():speak("You can't do that to a hat!")
       end,
-      lookat = function (self)
-        Gamestate.current().player:speak("It's a hat. Can't you tell from the shape, and detail?")
-        Gamestate.current().executing = nil
+      verbLookat = function (self)
+        RT:player():say("It's a hat. Can't you tell from the shape, and detail?")
       end,
-      pickup = function (self)
-        local game = Gamestate.current()
-        game.player.target = self.useposition
-        if game.player.x == self.useposition.x and game.player.y == self.useposition.y then
-          --block while we actually add, to prevent cancelling in the middle?
-          self.blocking = true
-          game.player:speak("This should come in handy")
-          game.inventory:add(self)
-          Rooms.current():remove(self)
-          
-          --now we're done, tidy up some bits
-          self.pickup = Object.pickup
-          game.executing = nil
-          self.blocking = false
+      verbPickup = function (self)
+        RT:walkactor(RT:player(), self)
+        while RT:player():isMoving() do
+          coroutine.yield()
         end
+        
+        
+        --block while we actually add, to prevent cancelling in the middle?
+        --self.blocking = true
+        RT:player():say("This should come in handy")
+        RT:player():pickup(self)
+        Rooms.current():remove(self)
+        
+        --now we're done, tidy up some bits
+        self.verbPickup = Object.verbPickup
+        --self.blocking = false
       end
     },
     {
@@ -44,15 +43,15 @@ return {
       width = 100,
       height = 300,
       usepos = { x = 250, y = 400 },
-      lookat = function (self)
-        Gamestate.current().player:speak("Looks like test2 is on the other side of the doorway.")
-        Gamestate.current().executing = nil
+      verbLookat = function (self)
+        RT:player():say("Looks like test2 is on the other side of the doorway.")
       end,
-      walkto = function (self)
-        if self:walkActorTo(Gamestate.current().player) then
-          Rooms.switch("test2")
-          Gamestate.current().executing = false
+      verbWalkto = function (self)
+        RT:walkactor(RT:player(), self)
+        while RT:player():isMoving() do
+          coroutine.yield()
         end
+        Rooms.switch("test2")
       end
     }
   },

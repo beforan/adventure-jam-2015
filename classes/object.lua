@@ -11,7 +11,6 @@ local object = Class {
       self.defaultVerb = "Look at"
       self.x = 0
       self.y = 0
-      self.usepos = {}
     end
     
     if type(param) == "table" then --build from an object spec table
@@ -25,19 +24,20 @@ local object = Class {
       
       --overrides, if present in the spec
       self.defaultVerb = param.defaultVerb or "Look at"
-      if param.noop then self.noop = param.noop end
-      if param.lookat then self.lookat = param.lookat end
-      if param.give then self.give = param.give end
-      if param.talkto then self.talkto = param.talkto end
-      if param.open then self.open = param.open end
-      if param.close then self.close = param.close end
-      if param.push then self.push = param.push end
-      if param.param then self.pull = param.pull end
-      if param.use then self.use = param.use end
-      if param.pickup then self.pickup = param.pickup end
+      if param.verbBad then self.verbBad = param.verbBad end
+      if param.verbWalkto then self.verbWalkto = param.verbWalkto end
+      if param.verbLookat then self.verbLookat = param.verbLookat end
+      if param.verbGive then self.verbGive = param.verbGive end
+      if param.verbTalkto then self.verbTalkto = param.verbTalkto end
+      if param.verbOpen then self.verbOpen = param.verbOpen end
+      if param.verbClose then self.verbClose = param.verbClose end
+      if param.verbPush then self.verbPush = param.verbPush end
+      if param.verbPull then self.verbPull = param.verbPull end
+      if param.verbUse then self.verbUse = param.verbUse end
+      if param.verbPickup then self.verbPickup = param.verbPickup end
       if param.draw then self.draw = param.draw end
       
-      self.usepos = param.usepos or {}
+      self.usepos = param.usepos
     end
     
     
@@ -50,8 +50,8 @@ function object:isHover(x, y)
 end
 
 --verbs
-function object:noop()
-  RT:sayline(RT:player(), "That doesn't seem to work")
+function object:verbBad()
+  RT:player():say("That doesn't seem to work")
 end
 
 function object:verbWalkto()
@@ -60,51 +60,47 @@ function object:verbWalkto()
   while player:isMoving() do
     coroutine.yield()
   end
+  
+  print("arrived")
 end
 
-function object:lookat()
-  Gamestate.current().player:speak("An object.")
-  Gamestate.current().executing = nil
+function object:verbLookat()
+  RT:player():say("An object.")
 end
 
-function object:give()
-  self:noop()
+function object:verbGive()
+  self:verbBad()
 end
 
-function object:talkto()
-  self:noop()
+function object:verbTalkto()
+  self:verbBad()
 end
 
-function object:open()
-  self:noop()
+function object:verbOpen()
+  self:verbBad()
 end
 
-function object:close()
-  self:noop()
+function object:verbClose()
+  self:verbBad()
 end
 
-function object:push()
-  self:noop()
+function object:verbPush()
+  self:verbBad()
 end
 
-function object:pull()
-  self:noop()
+function object:verbPull()
+  self:verbBad()
 end
 
-function object:use()
-  self:noop()
+function object:verbUse()
+  self:verbBad()
 end
 
-function object:pickup()
-  local inv = false
-  for _, v in ipairs(Gamestate.current().inventory.items) do
-    if v == self then inv = true; break end
-  end
-  if inv then
-    Gamestate.current().player:speak("I'm already carrying that.")
-    Gamestate.current().executing = nil
+function object:verbPickup()
+  if RT:player().inventory:contains(self) then
+    RT:player():say("I'm already carrying that.")
   else
-    self:noop()
+    self:verbBad()
   end
 end
 

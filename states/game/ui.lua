@@ -59,9 +59,9 @@ function ui:mousepressed(game, x, y, button)
   if zone == self.Zones.UpDown
   then return InventoryUI:mousepressed(x, y, button) end
   
-  --if button == "r" then
-  --  self:handleObjectDefault()
-  --end
+  if button == "r" then
+    self:handleObjectDefault(game)
+  end
   
   if zone == self.Zones.Room or zone == self.Zones.Inventory then
     game:execute(x, y)
@@ -89,6 +89,13 @@ function ui:handleRoomHover(game, x, y)
     end
   end
   return false
+end
+
+function ui:handleObjectDefault(game)
+  if not game.hovered then return end
+  if self:getZone() == self.Zones.Room then
+    game:prepVerb(game:getVerb(game.hovered.defaultVerb))
+  end
 end
 
 -- Helpers

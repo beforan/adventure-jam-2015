@@ -47,7 +47,17 @@ function ui:update()
 end
 
 function ui:draw()
+  local game = Gamestate.current()
   for _, v in ipairs(self.buttons) do
+    if game.hovered then 
+      if v.content == game.hovered.defaultVerb then
+        v:highlight()
+      else
+        v:lowlight()
+      end
+    else
+      v:lowlight()
+    end
     v:draw()
   end
 end
@@ -56,7 +66,7 @@ function ui:keypressed(key)
   local game = Gamestate.current()
   for _, v in ipairs(game.verbs) do
     if v.key == key then
-      game.prep.verb = v
+      game:prepVerb(v)
       break
     end
   end
