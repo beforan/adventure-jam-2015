@@ -11,7 +11,7 @@ local fonts = {
 }
 
 theme.fonts = {
-  verbLine = fonts.chivo[16],
+  verbline = fonts.chivo[16],
   verbButton = fonts.chivoblack[38],
   actorSpeak = fonts.chivoblack[24]
 }
@@ -27,9 +27,9 @@ theme.colors = {
       hover = { 101, 173, 255, 255 }
     }
   },
-  verbLine = {
+  verbline = {
     normal = { 0, 119, 255, 255 },
-    executing = { 101, 173, 255, 255 }
+    hold = { 101, 173, 255, 255 }
   }
 }
 

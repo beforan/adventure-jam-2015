@@ -1,69 +1,58 @@
-local Gamestate = require "lib.hump.gamestate"
 local Class = require "lib.hump.class"
-local Button = require "classes.button"
+local Signals = require "lib.hump.signal"
+
+local items = {}
 
 local inventory = Class {
   init = function (self)
-    self.buttonStart = 1
-    self.items = {}
-    self.buttons = {}
-    self.upbutton = Button(
-      "U", 565, 530, 40, 85,
-      function ()
-        if self.buttonStart == 1 then return end
-        self.buttonStart = self.buttonStart - 7
-        self:updateButtons()
-      end)
-    self.downbutton = Button(
-      "D", 565, 625, 40, 85,
-      function ()
-        if self.buttonStart + 21 > #self.items then return end
-        self.buttonStart = self.buttonStart + 7
-        self:updateButtons()
-      end)
+    self.signals = Signals.new()
   end
 }
 
+-- add an item to the inventory by reference
 function inventory:add(obj)
-  table.insert(self.items, obj)
-  self:updateButtons()
+  table.insert(items, obj)
+  self.signals.emit("item-added")
+  self.signals.emit("inventory-changed")
 end
 
-function inventory:updateButtons()
-  self.buttons = {}
-  local origin = { x = 610, y = 520 }
-  local pad, w, h = 5, 90, 60
-  local row = 1
-  
-  for i = 1, 21 do
-    local j = self.buttonStart + i - 1
-    local col = i - ((row-1) * 7)
-    local x = origin.x + ((col-1) * w) + (col * pad)
-    local y = origin.y + ((row-1) * h) + (row * pad)
-    
-    if self.items[j] then
-      self.buttons[i] = Button(
-        self.items[j].name,
-        x, y, w, h,
-        function () Gamestate.current().object = self.items[j] end)
-    else
-      self.buttons[i] = Button(
-      nil,
-      x, y, w, h,
-      nil)
+-- remove an item from the inventory, by index, name, or reference
+function inventory:remove(obj)
+  if type(obj) == "number" then
+    table.remove(items, obj)
+  else
+    for i, v in ipairs(items) do
+      if v == obj or v.name == obj then
+        table.remove(items, i)
+        break
+      end
     end
-    
-    if i % 7 == 0 then row = row + 1 end
+  end
+  self.signals.emit("item-removed")
+  self.signals.emit("inventory-changed")
+end
+
+-- see if the inventory contains an item, by index, name, or reference
+function inventory:contains(obj)
+  if type(obj) == "number" then return items[obj] ~= nil end
+  
+  for i, v in ipairs(items) do
+    if v == obj or v.name == obj then return true end
+  end
+  return false
+end
+
+--get a reference to an object in the inventory, by index or name
+function inventory:get(obj)
+  if type(obj) == "number" then return items[obj] end
+  
+  for _, v in ipairs(items) do
+    if v == obj or v.name == obj then return v end
   end
 end
 
-function inventory:draw()
-  for _, v in ipairs(self.buttons) do
-    v:draw()
-  end
-  
-  self.upbutton:draw()
-  self.downbutton:draw()
+function inventory:count() --item count; the UI uses this! not sure anything else will
+  return #items
 end
 
 return inventory
