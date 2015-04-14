@@ -6,40 +6,31 @@ local RT = require "states.game.runtime"
 local object = Class {
   init = function (self, param)
     self.type = "object"
-    if type(param) == "string" then --just the name passed in
-      self.name = param
-      self.defaultVerb = "Look at"
-      self.x = 0
-      self.y = 0
-    end
+    self.name = param.name or param
+    self.x = param.x or 0
+    self.y = param.y or 0
     
-    if type(param) == "table" then --build from an object spec table
-      self.name = param.name or ""
-      self.x = param.x or 0
-      self.y = param.y or 0
-      
-      --potentially set these off the image when that's working?
-      self.width = param.width or 20
-      self.height = param.height or 20
-      
-      --overrides, if present in the spec
-      self.defaultVerb = param.defaultVerb or "Look at"
-      if param.verbBad then self.verbBad = param.verbBad end
-      if param.verbWalkto then self.verbWalkto = param.verbWalkto end
-      if param.verbLookat then self.verbLookat = param.verbLookat end
-      if param.verbGive then self.verbGive = param.verbGive end
-      if param.verbTalkto then self.verbTalkto = param.verbTalkto end
-      if param.verbOpen then self.verbOpen = param.verbOpen end
-      if param.verbClose then self.verbClose = param.verbClose end
-      if param.verbPush then self.verbPush = param.verbPush end
-      if param.verbPull then self.verbPull = param.verbPull end
-      if param.verbUse then self.verbUse = param.verbUse end
-      if param.verbPickup then self.verbPickup = param.verbPickup end
-      if param.draw then self.draw = param.draw end
-      
-      self.usepos = param.usepos
-      self.useWith = param.useWith
-    end
+    --potentially set these off the image when that's working?
+    self.width = param.width or 20
+    self.height = param.height or 20
+    
+    --overrides, if present in the spec
+    self.defaultVerb = param.defaultVerb or "Look at"
+    if param.verbBad then self.verbBad = param.verbBad end
+    if param.verbWalkto then self.verbWalkto = param.verbWalkto end
+    if param.verbLookat then self.verbLookat = param.verbLookat end
+    if param.verbGive then self.verbGive = param.verbGive end
+    if param.verbTalkto then self.verbTalkto = param.verbTalkto end
+    if param.verbOpen then self.verbOpen = param.verbOpen end
+    if param.verbClose then self.verbClose = param.verbClose end
+    if param.verbPush then self.verbPush = param.verbPush end
+    if param.verbPull then self.verbPull = param.verbPull end
+    if param.verbUse then self.verbUse = param.verbUse end
+    if param.verbPickup then self.verbPickup = param.verbPickup end
+    if param.draw then self.draw = param.draw end
+    
+    self.usepos = param.usepos
+    self.useWith = param.useWith
     
     
   end
@@ -61,8 +52,6 @@ function object:verbWalkto()
   while player:isMoving() do
     coroutine.yield()
   end
-  
-  print("arrived")
 end
 
 function object:verbLookat()

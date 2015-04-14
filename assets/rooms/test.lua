@@ -20,14 +20,13 @@ return {
         RT:player():say("It's a hat. Can't you tell from the shape, and detail?")
       end,
       verbPickup = function (self)
-        RT:block()
         RT:walkactor(RT:player(), self)
         while RT:player():isMoving() do
           coroutine.yield()
         end
         
         --block while we actually add, to prevent cancelling in the middle?
-        
+        RT:block()
         RT:player():say("This should come in handy")
         RT:player():pickup(self)
         Rooms.current():remove(self)
@@ -66,6 +65,28 @@ return {
       end
     }
   },
-  actors = {},
+  actors = {
+    {
+      name = "Shovel-face Joe",
+      x = 100,
+      y = 100,
+      scripts = {
+        coroutine.create(function (self, dt)
+          print("i'm working!")
+          local timer = 5
+          
+          while timer > 0 do
+            timer = timer - dt
+            if timer <= 0 then
+              self:say("I'm Shovel-face Joe, yes I am")
+              timer = 5
+            end
+            
+            self, dt = coroutine.yield()
+          end
+        end)
+      }
+    }
+  },
   scripts = {}
 }

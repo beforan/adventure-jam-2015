@@ -29,7 +29,11 @@ function game:init()
   
   self.prep = {}
   
-  self:switchPlayer(Actor())
+  --load the player actor (no switching in this game :) )
+  local player = Actor("Guybrush")
+  player.color = { 255, 255, 255, 255 } --obvs white text for player :)
+  
+  self:switchPlayer(player)
   self.player:setPos(400, 200)
   
   --handle room stuff sometime
@@ -71,6 +75,8 @@ function game:update(dt)
   end--]]
   
   self.player:update(dt)
+  
+  Rooms.current():update(dt)
   
   UI:update(dt)
   

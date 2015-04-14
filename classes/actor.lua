@@ -1,29 +1,59 @@
 local Class = require "lib.hump.class"
+local Utils = require "classes.utils"
+local RT = require "states.game.runtime"
 local Theme = require "assets.theme"
 local Inventory = require "classes.inventory"
 
 local actor = Class {
-  init = function (self)
-    self.x = 0
-    self.y = 0
-    self.speech = ""
-    self.color = { 120, 120, 0, 255 }
-    self.scripts = {}
-    self.inventory = Inventory()
+  init = function (self, param)
     self.type = "actor"
-  end 
+    self.name = param.name or param
+    
+    self.x = param.x or 0
+    self.y = param.y or 0
+    --potentially set these off the image when that's working?
+    self.width = param.width or 20
+    self.height = param.height or 20
+    
+    self.color = param.color or { 120, 120, 0, 255 }
+    self.speech = ""
+    
+    self.defaultVerb = param.defaultVerb or "Look at"
+    if param.verbBad then self.verbBad = param.verbBad end
+    if param.verbWalkto then self.verbWalkto = param.verbWalkto end
+    if param.verbLookat then self.verbLookat = param.verbLookat end
+    if param.verbGive then self.verbGive = param.verbGive end
+    if param.verbTalkto then self.verbTalkto = param.verbTalkto end
+    if param.verbOpen then self.verbOpen = param.verbOpen end
+    if param.verbClose then self.verbClose = param.verbClose end
+    if param.verbPush then self.verbPush = param.verbPush end
+    if param.verbPull then self.verbPull = param.verbPull end
+    if param.verbUse then self.verbUse = param.verbUse end
+    if param.verbPickup then self.verbPickup = param.verbPickup end
+    if param.draw then self.draw = param.draw end
+    
+    self.usepos = param.usepos
+    
+    self.scripts = param.scripts or {}
+    self.inventory = Inventory()
+    if param.inventory then
+      for _, v in param.inventory do
+        self.inventory:add(v)
+      end
+    end
+  end
 }
 
 function actor:update(dt)
   --anonymous scripts
   for i, v in ipairs(self.scripts) do
-    if not coroutine.resume(v, dt) then -- run the coroutine this frame
+    if not coroutine.resume(v, self, dt) then -- run the coroutine this frame
       table.remove(self.scripts, i) -- remove it if it's in a dead state
     end
   end
   --named scripts
   for k, v in pairs(self.scripts) do
-    if not coroutine.resume(v, dt) then -- run the coroutine this frame
+    if not coroutine.resume(v, self, dt) then -- run the coroutine this frame
       self.scripts[k] = nil -- remove it if it's in a dead state
     end
   end
@@ -35,7 +65,7 @@ function actor:draw()
 end
 function actor:drawBody()
   love.graphics.setColor(self.color)
-  love.graphics.rectangle("fill", self.x - 10, self.y - 10, 20, 20)
+  love.graphics.rectangle("fill", self.x, self.y, 20, 20)
 end
 function actor:drawSpeech()
   if self.speech == "" then return end
@@ -113,7 +143,7 @@ function actor:move(dt, pos)
     if self.x > pos.x then self.x = self.x - math.round(speed * dt) end
     if self.y < pos.y then self.y = self.y + math.round(speed * dt) end
     if self.y > pos.y then self.y = self.y - math.round(speed * dt) end
-    dt = coroutine.yield()
+    self, dt = coroutine.yield()
   end
 end
 
@@ -131,6 +161,60 @@ function actor:talk(dt, text)
   end
   
   self.speech = ""
+end
+
+--helpers
+function actor:isHover(x, y)
+  return Utils.isHover(self, x, y)
+end
+
+--verbs
+function actor:verbBad()
+  RT:player():say("I don't think they'd like that.")
+end
+
+function actor:verbWalkto()
+  local player = RT:player()
+  RT:walkactor(player, self)
+  while player:isMoving() do
+    coroutine.yield()
+  end
+end
+
+function actor:verbLookat()
+  RT:player():say("A person.")
+end
+
+function actor:verbGive()
+  self:verbBad()
+end
+
+function actor:verbTalkto()
+  self:verbBad()
+end
+
+function actor:verbOpen()
+  self:verbBad()
+end
+
+function actor:verbClose()
+  self:verbBad()
+end
+
+function actor:verbPush()
+  self:verbBad()
+end
+
+function actor:verbPull()
+  self:verbBad()
+end
+
+function actor:verbUse()
+  self:verbBad()
+end
+
+function actor:verbPickup()
+  self:verbBad()
 end
 
 return actor

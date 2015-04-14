@@ -1,5 +1,6 @@
 local Class = require "lib.hump.class"
 local Object = require "classes.object"
+local Actor = require "classes.actor"
 
 local room = Class {
   init = function (self, name)
@@ -8,11 +9,25 @@ local room = Class {
     
     self.name = name
     self.objects = {}
-    for _, v in ipairs(spec.objects) do
-      table.insert(self.objects, Object(v))
+    if spec.objects then
+      for _, v in ipairs(spec.objects) do
+        table.insert(self.objects, Object(v))
+      end
+    end
+    self.actors = {}
+    if spec.actors then
+      for _, v in ipairs(spec.actors) do
+        table.insert(self.actors, Actor(v))
+      end
     end
   end
 }
+
+function room:update(dt)
+  for _, v in ipairs(self.actors) do
+    v:update(dt)
+  end
+end
 
 function room:draw()
   --draw the room background
@@ -21,6 +36,11 @@ function room:draw()
   
   --draw the room's objects
   for _, v in ipairs(self.objects) do
+    v:draw()
+  end
+  
+  --draw the room's actors
+  for _, v in ipairs(self.actors) do
     v:draw()
   end
 end

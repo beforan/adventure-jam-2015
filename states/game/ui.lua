@@ -83,7 +83,12 @@ end
 -- Handlers
 function ui:handleRoomHover(game, x, y)
   --actors take priority over objects
-  --check each actor
+  for _, v in ipairs(Rooms.current().actors) do
+    if v:isHover(x, y) then
+      game.hovered = v
+      return true
+    end
+  end
   
   for _, v in ipairs(Rooms.current().objects) do
     if v:isHover(x, y) then
