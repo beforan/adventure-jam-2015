@@ -83,7 +83,8 @@ function ui:updateButtons()
       self.buttons[i] = Button(
         item.name,
         x, y, self.buttons.width, self.buttons.height,
-        function () Gamestate.current().target = item end)
+        function () Gamestate.current().hovered = item end)
+      
     else
       self.buttons[i] = Button(
       nil,

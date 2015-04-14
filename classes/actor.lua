@@ -10,6 +10,7 @@ local actor = Class {
     self.color = { 120, 120, 0, 255 }
     self.scripts = {}
     self.inventory = Inventory()
+    self.type = "actor"
   end 
 }
 
@@ -59,12 +60,14 @@ function actor:drawSpeech()
   love.graphics.printf(self.speech, x, y, w, align)
 end
 
-function actor:setPos(pos)
+function actor:setPos(pos_x, y)
+  local pos = y and { x = pos_x, y = y } or pos_x
   self.x = pos.x
-  self.y = pos.x
+  self.y = pos.y
 end
 
-function actor:moveTo(pos)
+function actor:moveTo(pos_x, y)
+  local pos = y and { x = pos_x, y = y } or pos_x
   self:stop()
   self.scripts.move = coroutine.create(self.move)
   coroutine.resume(self.scripts.move, self, love.timer.getDelta(), pos)

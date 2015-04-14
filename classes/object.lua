@@ -1,15 +1,17 @@
 local Class = require "lib.hump.class"
 local Gamestate = require "lib.hump.gamestate"
 local Utils = require "classes.utils"
+local RT = require "states.game.runtime"
 
 local object = Class {
   init = function (self, param)
+    self.type = "object"
     if type(param) == "string" then --just the name passed in
       self.name = param
       self.defaultVerb = "Look at"
       self.x = 0
       self.y = 0
-      self.useposition = {}
+      self.usepos = {}
     end
     
     if type(param) == "table" then --build from an object spec table
@@ -35,7 +37,7 @@ local object = Class {
       if param.pickup then self.pickup = param.pickup end
       if param.draw then self.draw = param.draw end
       
-      self.useposition = param.useposition or {}
+      self.usepos = param.usepos or {}
     end
     
     
@@ -47,20 +49,16 @@ function object:isHover(x, y)
   return Utils.isHover(self, x, y)
 end
 
-function object:walkActorTo(actor)
-  actor.target = self.useposition or { x = self.x, y = self.y }
-  return actor.target.x == actor.x and actor.target.y == actor.y
-end
-
 --verbs
 function object:noop()
-  Gamestate.current().player:speak("That doesn't seem to work.")
-  Gamestate.current().executing = nil
+  RT:sayline(RT:player(), "That doesn't seem to work")
 end
 
-function object:walkto()
-  if self:walkActorTo(Gamestate.current().player) then
-    Gamestate.current().executing = nil
+function object:verbWalkto()
+  local player = RT:player()
+  RT:walkactor(player, self)
+  while player:isMoving() do
+    coroutine.yield()
   end
 end
 

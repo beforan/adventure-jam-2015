@@ -12,10 +12,31 @@ local Gamestate = require "lib.hump.gamestate"
 local rt = {}
 
 -- verbs
-function rt:verbWalkto(target)
-  if target.verbWalkto then
-    Gamestate.current().executing.script = coroutine.create(target.verbWalkto)
-  else self:walkactor(self:player(), target) end
+function rt:executeVerb(exec)
+  local game = Gamestate.current()
+  --check for invalid Location style targets
+  if exec.verb ~= game:getVerb("Walk to") then
+    -- locations aren't allowed on non-Walk to verbs!
+    if not exec.target.type then return end
+    
+    -- check for second target where expected
+    if exec.verb == game:getVerb("Give") then
+      if not exec.target2 then return end
+    end
+    if exec.verb == game:getVerb("Use") and exec.target.useWith then
+      if not exec.target2 then return end
+    end
+  end
+  
+  self[exec.verb.id](self, exec)
+end
+
+function rt:verbWalkto(exec)
+  if exec.target.type then
+    exec.script = coroutine.create(exec.target.verbWalkto)
+  else
+    self:walkactor(self:player(), exec.target)
+  end
 end
 
 

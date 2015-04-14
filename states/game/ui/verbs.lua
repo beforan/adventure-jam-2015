@@ -33,7 +33,8 @@ function ui:createButtons()
     self.buttons[i] = Button(
       v.name,
       x, y, self.buttons.width, self.buttons.height,
-      function () game.verb = v end)
+      function () Gamestate.current():prepVerb(v) end)
+    
     
     if i % (self.buttons.cols) == 0 then row = row + 1 end
   end
@@ -55,7 +56,7 @@ function ui:keypressed(key)
   local game = Gamestate.current()
   for _, v in ipairs(game.verbs) do
     if v.key == key then
-      game.current.verb = v
+      game.prep.verb = v
       break
     end
   end

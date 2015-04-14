@@ -46,15 +46,15 @@ function ui:mousemoved(game, x, y)
   end
   
   --handled "mouse out" (i.e. hovering over nothing)
-  if not hoverHandled then game.target = nil end
+  if not hoverHandled then game.hovered = nil end
 end
 
-function ui:mousepressed(x, y, button)
+function ui:mousepressed(game, x, y, button)
   local zone = self:getZone(x, y)
   
   --left or right, no matter, set the verb
   if zone == self.Zones.Verbs
-  then return VerbUI:mousepressed(x, y, button) end
+  then VerbUI:mousepressed(x, y, button) end
   
   if zone == self.Zones.UpDown
   then return InventoryUI:mousepressed(x, y, button) end
@@ -63,8 +63,10 @@ function ui:mousepressed(x, y, button)
   --  self:handleObjectDefault()
   --end
   
-  --if zone == self.mouseZones.Room or zone == self.mouseZones.Inventory
-  --then self.game:executeVerbLine() end
+  if zone == self.Zones.Room or zone == self.Zones.Inventory then
+    game:execute(x, y)
+    VerblineUI.holdTimer = 0.5
+  end
 end
 
 function ui:keypressed(key)
@@ -82,7 +84,7 @@ function ui:handleRoomHover(game, x, y)
   
   for _, v in ipairs(Rooms.current().objects) do
     if v:isHover(x, y) then
-      game.target = v
+      game.hovered = v
       return true
     end
   end

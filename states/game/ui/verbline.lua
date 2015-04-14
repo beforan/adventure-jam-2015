@@ -7,30 +7,68 @@ local ui = Class {
   init = function (self)
     self.zone = Hotspot(0,500, love.window.getWidth(), love.window.getHeight())
     self.text = ""
-    self.hold = false
+    self.holdTimer = 0
+    
+    self.conjunction = {
+      Give = " to ",
+      Use = " with "
+    }
   end
 }
 
 function ui:update(dt)
   local game = Gamestate.current()
   
-  if game.executing then
-    --not sure what this will look like yet
-    --check type (object/actor vs co-ords)
-    --this determines indefinite holding (while executing)
-    --or a quick timer
-    --this will also include execution setup
-    --(e.g. give x to ... is incomplete)
-    --for now let's always do the quick timer, like previously
+  -- determine how we're building the verb line
+  local source = ""
+  if game.executing and game.executing.script then
+    source = "exec"
+  elseif not game.prep.verb then
+    source = "none"
+  else
+    source = "prep"
   end
   
-  --if not game.executing then --or self.holdtimer <= 0 then -- hover / preview mode
-    self.hold = false
-    self.text =
-      (game.verb and game.verb.name or game:getDefaultVerb().name)
+  if source == "prep" then
+    if game.prep.incomplete then
+      self.text = 
+        game.prep.verb.name
+        .. " " ..
+        (game.prep.target and game.prep.target.name
+        .. (self.conjunction[game.prep.verb.name] or "") or "") ..
+        (game.hovered and game.hovered.name or "")
+    end
+  end
+  
+  if source == "exec" then
+    self.hold = true
+    self.holdTimer = 0 --don't need this if we're in exec hold
+    self.text = 
+      game.executing.verb.name
       .. " " ..
-      (game.target and game.target.name or "")
-  --end
+      game.executing.target.name
+    
+    if game.executing.target2 then
+      self.text = self.text .. (self.conjunction[game.executing.verb.name] or "") ..
+        game.executing.target2.name
+    end
+  end
+  
+  if source == "none" then
+    --timer hold check
+    self.hold = self.holdTimer > 0
+    if self.hold then
+      self.holdTimer = self.holdTimer - dt
+      
+      --use exec, just not based on an ongoing script
+      -- e.g. walk to / verb with no param
+      self.text = game.executing.verb.name
+    else
+      self.text =
+        game:getDefaultVerb().name
+        .. (game.hovered and (" " .. game.hovered.name) or "")
+    end
+  end
 end
 
 function ui:draw()

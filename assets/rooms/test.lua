@@ -43,7 +43,7 @@ return {
       y = 100,
       width = 100,
       height = 300,
-      useposition = { x = 250, y = 400 },
+      usepos = { x = 250, y = 400 },
       lookat = function (self)
         Gamestate.current().player:speak("Looks like test2 is on the other side of the doorway.")
         Gamestate.current().executing = nil

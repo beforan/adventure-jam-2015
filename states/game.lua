@@ -1,6 +1,7 @@
 local game = {}
 
 local Signals = require "lib.hump.signal"
+local Class = require "lib.hump.class"
 
 local Actor = require "classes.actor"
 local Verb = require "classes.verb"
@@ -26,19 +27,10 @@ function game:init()
   }
   self.defaultVerb = { Room = Verb("Walk to"), Inventory = self.verbs[5] }
   
-  self.verb = nil
-  self.target = nil
-    
-  --[[self.executing = {
-    verb = nil,
-    target = nil,
-    target2 = nil,
-    ["type"] = nil,
-    script = nil
-  }--]]
+  self.prep = {}
   
   self:switchPlayer(Actor())
-  self.player:setPos({ x = 40, y = 300 })
+  self.player:setPos(40, 300)
   
   --handle room stuff sometime
   Rooms.switch("test")
@@ -50,7 +42,9 @@ end
 
 function game:update(dt)
   if self.player.inventory:count() == 0 then
-    self.player.inventory:add(Object("hat"))
+    local o = Object("hat")
+    o.useWith = true
+    self.player.inventory:add(o)
     self.player.inventory:add(Object("dog"))
     self.player.inventory:add(Object("cat"))
     self.player.inventory:add(Object("log"))
@@ -79,6 +73,20 @@ function game:update(dt)
   self.player:update(dt)
   
   UI:update(dt)
+  
+  --keep running the executing coroutine, or tidy up if it's dead
+  if self.executing then
+    if self.executing.script then
+      local success, err = coroutine.resume(
+        self.executing.script,
+        self.executing.target,
+        dt)
+      if not success then
+        print(err)
+        self.executing.script = nil
+      end
+    end
+  end
 end
 
 function game:draw()
@@ -93,7 +101,7 @@ end
 
 -- Callbacks
 function game:mousepressed(x, y, button)
-  UI:mousepressed(x, y, button)
+  UI:mousepressed(self, x, y, button)
 end
 
 function game:keypressed(key)
@@ -105,6 +113,47 @@ function game:mousemoved(x, y)
 end
 
 -- Helpers
+function game:execute(x, y)
+  if self.prep.target then --we already have a target, we must want another
+    -- add a second parameter to prep
+    self.prep.target2 = self.hovered
+    self.prep.incomplete = false
+  else
+    -- update prep
+    if not self.prep.verb then self.prep.verb = self:getDefaultVerb() end
+    self.prep.target = self.hovered or { x = x, y = y }
+    
+    --completion conditions
+    if not self.prep.target.type then -- target is a location
+      self.prep.incomplete = false
+    elseif not self.prep.verb == game:getVerb("Give") then -- Give requires 2 nouns
+      if not self.prep.verb == game:getVerb("Use")
+        or not self.prep.target.useWith then -- Use requires 2 nouns if useWith is true
+          self.prep.incomplete = false
+      end
+    end
+  end
+  
+  if not self.prep.incomplete then
+    --convert prep to executing
+    self.executing = {} -- cancel any prior execution at this point
+    self.executing.verb = self.prep.verb
+    self.executing.target = self.prep.target
+    self.executing.target2 = self.prep.target2
+    
+    self.prep = {}
+    
+    RT:executeVerb(self.executing)
+  end
+end
+
+function game:prepVerb(verb)
+  self.prep = {
+    verb = verb,
+    incomplete = true
+  }
+end
+
 function game:getDefaultVerb()
   if UI:getZone() == UI.Zones.Inventory then
     return self.defaultVerb.Inventory
