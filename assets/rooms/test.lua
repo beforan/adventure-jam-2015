@@ -12,28 +12,39 @@ return {
       name = "hat",
       x = 500,
       y = 150,
+      useWith = true,
       verbBad = function (self)
-        RT:player():speak("You can't do that to a hat!")
+        RT:player():say("You can't do that to a hat!")
       end,
       verbLookat = function (self)
         RT:player():say("It's a hat. Can't you tell from the shape, and detail?")
       end,
       verbPickup = function (self)
+        RT:block()
         RT:walkactor(RT:player(), self)
         while RT:player():isMoving() do
           coroutine.yield()
         end
         
-        
         --block while we actually add, to prevent cancelling in the middle?
-        --self.blocking = true
+        
         RT:player():say("This should come in handy")
         RT:player():pickup(self)
         Rooms.current():remove(self)
         
         --now we're done, tidy up some bits
         self.verbPickup = Object.verbPickup
-        --self.blocking = false
+        RT:unblock()
+      end,
+      verbGive = function (self, dt, exec)
+        if exec.target2.name == "dog" then
+          RT:player():say("It won't fit him.")
+        else
+          self:verbBad()
+        end
+      end,
+      verbUse = function (self, dt, exec)
+        self:verbGive(dt, exec)
       end
     },
     {

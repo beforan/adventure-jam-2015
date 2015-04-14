@@ -38,6 +38,7 @@ local object = Class {
       if param.draw then self.draw = param.draw end
       
       self.usepos = param.usepos
+      self.useWith = param.useWith
     end
     
     

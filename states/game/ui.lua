@@ -1,4 +1,5 @@
 local Class = require "lib.hump.class"
+local Gamestate = require "lib.hump.gamestate"
 
 local InventoryUI = require "states.game.ui.inventory"
 local VerbUI = require "states.game.ui.verbs"
@@ -26,8 +27,10 @@ function ui:update(dt)
 end
 
 function ui:draw()
-  VerbUI:draw()
-  InventoryUI:draw()
+  if not Gamestate.current().blocking then
+    VerbUI:draw()
+    InventoryUI:draw()
+  end
   VerblineUI:draw()
 end
 

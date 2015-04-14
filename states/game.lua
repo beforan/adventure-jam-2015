@@ -30,7 +30,7 @@ function game:init()
   self.prep = {}
   
   self:switchPlayer(Actor())
-  self.player:setPos(40, 300)
+  self.player:setPos(400, 200)
   
   --handle room stuff sometime
   Rooms.switch("test")
@@ -80,7 +80,8 @@ function game:update(dt)
       local success, err = coroutine.resume(
         self.executing.script,
         self.executing.target,
-        dt)
+        dt,
+        self.executing)
       if not success then
         print(err)
         self.executing.script = nil
@@ -101,19 +102,27 @@ end
 
 -- Callbacks
 function game:mousepressed(x, y, button)
-  UI:mousepressed(self, x, y, button)
+  if not self.blocking then
+    UI:mousepressed(self, x, y, button)
+  end
 end
 
 function game:keypressed(key)
-  UI:keypressed(key)
+  if not self.blocking then
+    UI:keypressed(key)
+  end
 end
 
 function game:mousemoved(x, y)
-  UI:mousemoved(self, x, y)
+  if not self.blocking then
+    UI:mousemoved(self, x, y)
+  end
 end
 
 -- Helpers
 function game:execute(x, y)
+  if self.blocking then return end
+  
   if self.prep.target then --we already have a target, we must want another
     -- add a second parameter to prep
     self.prep.target2 = self.hovered

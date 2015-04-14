@@ -47,6 +47,17 @@ function rt:sayline(actor, text)
   actor:say(text)
 end
 
+--blocking
+function rt:block()
+  Gamestate.current().blocking = true
+end
+function rt:unblock()
+  Gamestate.current().blocking = false
+end
+function rt:blocking()
+  return Gamestate.current().blocking
+end
+
 -- shortcuts
 function rt:player()
   return Gamestate.current().player
