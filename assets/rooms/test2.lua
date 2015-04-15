@@ -6,11 +6,12 @@ return {
   name = "test2",
   background = "",
   foreground = "",
+  width = 300,
   clipY = 0,
   objects = {
     {
       name = "dog",
-      x = 300,
+      x = 250,
       y = 350,
       useposition = { x = 300, y = 350 },
       verbBad = function (self)

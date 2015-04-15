@@ -7,6 +7,9 @@ local room = Class {
     --load properties from a simple table :)
     local spec = require("assets.rooms." .. name)
     
+    self.width = spec.width or love.window.getWidth()
+    --self.height = spec.height
+    
     self.name = name
     self.objects = {}
     if spec.objects then
@@ -32,7 +35,7 @@ end
 function room:draw()
   --draw the room background
   love.graphics.setColor(180, 0, 0, 255)
-  love.graphics.rectangle("fill", 0, 0, 1280, 500)
+  love.graphics.rectangle("fill", 0, 0, self.width, 500)
   
   --draw the room's objects
   for _, v in ipairs(self.objects) do

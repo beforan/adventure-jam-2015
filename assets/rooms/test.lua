@@ -4,10 +4,16 @@ local Object = require "classes.object"
 
 return {
   name = "test",
+  width = 1500,
   background = "",
   foreground = "",
   clipY = 0,
   objects = {
+    {
+      name = "cheese",
+      x = 1350,
+      y = 300
+    },
     {
       name = "hat",
       x = 500,
@@ -61,7 +67,7 @@ return {
         while RT:player():isMoving() do
           coroutine.yield()
         end
-        Rooms.switch("test2")
+        Rooms:switch("test2")
       end
     }
   },
@@ -71,8 +77,7 @@ return {
       x = 100,
       y = 100,
       scripts = {
-        coroutine.create(function (self, dt)
-          print("i'm working!")
+        --[[coroutine.create(function (self, dt)
           local timer = 5
           
           while timer > 0 do
@@ -84,7 +89,7 @@ return {
             
             self, dt = coroutine.yield()
           end
-        end)
+        end)--]]
       }
     }
   },

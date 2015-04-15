@@ -1,7 +1,6 @@
 local game = {}
 
 local Signals = require "lib.hump.signal"
-local Class = require "lib.hump.class"
 
 local Actor = require "classes.actor"
 local Verb = require "classes.verb"
@@ -11,7 +10,7 @@ local RT = require "states.game.runtime"
 local UI = require "states.game.ui"
 local Rooms = require "states.game.rooms"
 local Theme = require "assets.theme"
-
+local Cam = require "states.game.camera"
 
 function game:init()
   self.verbs = {
@@ -36,47 +35,23 @@ function game:init()
   self:switchPlayer(player)
   self.player:setPos(400, 200)
   
-  --handle room stuff sometime
-  Rooms.switch("test")
+  --handle room stuff
+  Rooms.signals.register("room-switched", function () Cam:roomInit() end)
 end
 
 function game:enter()
-  
+  if not Rooms.current() then
+    Rooms:switch("test")
+  end
 end
 
 function game:update(dt)
-  --[[if self.player.inventory:count() == 0 then
-    local o = Object("hat")
-    o.useWith = true
-    self.player.inventory:add(o)
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-    self.player.inventory:add(Object("hat"))
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-    self.player.inventory:add(Object("hat"))
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-    self.player.inventory:add(Object("hat"))
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-    self.player.inventory:add(Object("hat"))
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-    self.player.inventory:add(Object("hat"))
-    self.player.inventory:add(Object("dog"))
-    self.player.inventory:add(Object("cat"))
-    self.player.inventory:add(Object("log"))
-  end--]]
-  
   self.player:update(dt)
   
   Rooms.current():update(dt)
+  
+  --update room camera position
+  Cam:roomUpdate()
   
   UI:update(dt)
   
@@ -97,19 +72,27 @@ function game:update(dt)
 end
 
 function game:draw()
-  Rooms.current():draw()
+  -- setup the room viewport
+  love.graphics.setStencil(Cam.viewport)
   
+  Cam:attach()
+  Rooms.current():draw()
   self.player:draw()
+  Cam:detach()
+  
+  -- reset
+  love.graphics.setStencil()
+  love.graphics.origin()
   
   UI:draw()
-  
   self:drawDebug()
 end
 
 -- Callbacks
 function game:mousepressed(x, y, button)
   if not self.blocking then
-    UI:mousepressed(self, x, y, button)
+    local worldX, worldY = Cam:worldCoords(x, y)
+    UI:mousepressed(self, worldX, worldY, button)
   end
 end
 
@@ -121,7 +104,8 @@ end
 
 function game:mousemoved(x, y)
   if not self.blocking then
-    UI:mousemoved(self, x, y)
+    local worldX, worldY = Cam:worldCoords(x, y)
+    UI:mousemoved(self, worldX, worldY)
   end
 end
 
