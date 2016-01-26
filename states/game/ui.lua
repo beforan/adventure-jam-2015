@@ -62,7 +62,7 @@ function ui:mousepressed(game, x, y, button)
   if zone == self.Zones.UpDown
   then return InventoryUI:mousepressed(x, y, button) end
   
-  if button == "r" then
+  if button == 2 then
     self:handleObjectDefault(game)
   end
   

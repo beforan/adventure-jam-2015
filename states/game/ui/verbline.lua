@@ -5,7 +5,7 @@ local Gamestate = require "lib.hump.gamestate"
 
 local ui = Class {
   init = function (self)
-    self.zone = Hotspot(0,500, love.window.getWidth(), love.window.getHeight())
+    self.zone = Hotspot(0,500, love.graphics.getWidth(), love.graphics.getHeight())
     self.text = ""
     self.holdTimer = 0
     

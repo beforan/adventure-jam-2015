@@ -79,9 +79,9 @@ function actor:drawSpeech()
   if x < 5 then x = 5; align = "left" end
   if x + w > 1275 then x = 1275 - w; align = "right" end
   --setup y within window bounds
-  local y = self.y - 150 - (lines * font:getHeight()) --TODO: 150 is arbitrary - will need adjusting based on sprite height
+  local y = self.y - 150 - (#lines * font:getHeight()) --TODO: 150 is arbitrary - will need adjusting based on sprite height
   if y < 5 then y = 5 end
-  if lines > 1 then align = "center" end --always center if wrapping
+  if #lines > 1 then align = "center" end --always center if wrapping
   
   love.graphics.setFont(font)
   love.graphics.setColor(0, 0, 0, 255)

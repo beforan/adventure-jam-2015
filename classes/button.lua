@@ -58,7 +58,7 @@ end
 
 function button:isPressed()
   return self:isHover()
-  and (love.mouse.isDown("l") or love.mouse.isDown("r"))
+  and love.mouse.isDown(1, 2)
 end
 
 function button:isActive()

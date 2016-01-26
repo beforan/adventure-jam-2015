@@ -73,7 +73,8 @@ end
 
 function game:draw()
   -- setup the room viewport
-  love.graphics.setStencil(Cam.viewport)
+  love.graphics.stencil(Cam.viewport, "replace", 1)
+  love.graphics.setStencilTest("greater", 0)
   
   Cam:attach()
   Rooms.current():draw()
@@ -81,7 +82,7 @@ function game:draw()
   Cam:detach()
   
   -- reset
-  love.graphics.setStencil()
+  love.graphics.setStencilTest()
   love.graphics.origin()
   
   UI:draw()
